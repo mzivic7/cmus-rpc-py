@@ -28,26 +28,31 @@ defaults = {
 }
 
 
-def load_config(path):
-    """Loads settings from config
-    If some value is missing, it is replaced wih default value"""
+def load_config(path, default):
+    """
+    Loads settings from config
+    If some value is missing, it is replaced wih default value
+    """
     config = ConfigParser()
+    path = os.path.expanduser(path)
     config.read(path)
     if not os.path.exists(path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         config.add_section("main")
-        for key in defaults.keys():
-            config.set("main", key, str(defaults[key]))
-        with open(path, 'w') as f:
+        for key in default.keys():
+            config.set("main", key, str(default[key]))
+        with open(path, "w") as f:
             config.write(f)
-        config_data = defaults
+        config_data = default
     else:
         config_data_raw = config._sections["main"]
-        config_data = dict.fromkeys(defaults)
-        for key in defaults.keys():
+        config_data = dict.fromkeys(default)
+        for key in default.keys():
             if key in list(config["main"].keys()):
-                if key == "silent":
-                    config_data[key] = literal_eval(config_data_raw[key])
-                else:
+                try:
+                    eval_value = literal_eval(config_data_raw[key])
+                    config_data[key] = eval_value
+                except ValueError:
                     config_data[key] = config_data_raw[key]
             else:
                 config_data[key] = defaults[key]
@@ -77,7 +82,7 @@ def cmus_status(no_data="Unknown"):
     output, error = proc.communicate()
     if error:
         return None, None, None
-    status = output.decode().split('\n')
+    status = output.decode().split("\n")
     artist = album = title = genre = date = no_data
     for line in status:
         line_split = line.split(" ")
@@ -141,8 +146,10 @@ def to_h_m_s(seconds, clip=True):
 
 
 def custom_format(string, song_data):
-    """Formats string with song data using specific keys.
-    Key starts with %. To omit % from being treated as key, use %% instead."""
+    """
+    Formats string with song data using specific keys.
+    Key starts with %. To omit % from being treated as key, use %% instead.
+    """
     string = (
         string
         .replace("%%", "/%%/")
@@ -164,7 +171,7 @@ def main(args):
     args_dict = vars(args)
     config_path = args.config
     if config_path:
-        config_ini = load_config(config_path)
+        config_ini = load_config(config_path, defaults)
         config = dict.fromkeys(defaults)
         for key in defaults.keys():
             if args_dict[key] != "":
@@ -257,7 +264,7 @@ def main(args):
             if debug:
                 print("\n--- STATE CHANGE ---")
                 print(f"new_path = {song_path}")
-                print(f"new_state = {'playing' if playing else 'paused'}")
+                print(f"new_state = {"playing" if playing else "paused"}")
             if not song_path:
                 if not silent or debug:
                     print("Connection to cmus lost, exitting...")
@@ -355,7 +362,7 @@ def argparser():
         "--config",
         type=str,
         action="store",
-        help="custom path to config_path file"
+        help="custom path to config file, if file does not exist, config with defaults wil be created"
     )
     parser.add_argument(
         "-s",
@@ -465,7 +472,7 @@ def argparser():
         "-v",
         "--version",
         action="version",
-        version="%(prog)s 0.1.0"
+        version="%(prog)s 0.1.1"
     )
     return parser.parse_args()
 
