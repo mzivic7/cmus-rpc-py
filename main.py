@@ -1,13 +1,13 @@
-from pypresence import Presence
-from configparser import ConfigParser
-from ast import literal_eval
 import argparse
-import subprocess
-import signal
-import time
-import sys
 import os
+import signal
+import subprocess
+import sys
+import time
+from ast import literal_eval
+from configparser import ConfigParser
 
+from pypresence import Presence
 
 defaults = {
     "appid": 1312496743879016488,
@@ -39,7 +39,7 @@ def load_config(path, default):
     if not os.path.exists(path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         config.add_section("main")
-        for key in default.keys():
+        for key in default:
             config.set("main", key, str(default[key]))
         with open(path, "w") as f:
             config.write(f)
@@ -47,7 +47,7 @@ def load_config(path, default):
     else:
         config_data_raw = config._sections["main"]
         config_data = dict.fromkeys(default)
-        for key in default.keys():
+        for key in default:
             if key in list(config["main"].keys()):
                 try:
                     eval_value = literal_eval(config_data_raw[key])
@@ -55,7 +55,7 @@ def load_config(path, default):
                 except ValueError:
                     config_data[key] = config_data_raw[key]
             else:
-                config_data[key] = defaults[key]
+                config_data[key] = default[key]
     return config_data
 
 
@@ -122,7 +122,7 @@ def cmus_status(no_data="Unknown"):
     return song_path, playing, song_data
 
 
-def to_h_m_s(seconds, clip=True):
+def to_h_m_s(seconds):
     """Formats time from seconds to (HH:MM:SS) and clips hours if it is 0"""
     hours = minutes = 0
     minutes, seconds = divmod(seconds, 60)
@@ -130,8 +130,7 @@ def to_h_m_s(seconds, clip=True):
         hours, minutes = divmod(minutes, 60)
         if hours:
             days, hours = divmod(hours, 24)
-            if hours > 999:
-                hours = 999
+            hours = min(hours, 999)
     if seconds < 10:
         seconds = "0" + str(seconds)
     if minutes < 10:
@@ -140,8 +139,7 @@ def to_h_m_s(seconds, clip=True):
         hours = "0" + str(hours)
     if hours:
         return f"{hours}:{minutes}:{seconds}"
-    else:
-        return f"{minutes}:{seconds}"
+    return f"{minutes}:{seconds}"
 
 
 
@@ -150,7 +148,7 @@ def custom_format(string, song_data):
     Formats string with song data using specific keys.
     Key starts with %. To omit % from being treated as key, use %% instead.
     """
-    string = (
+    return (
         string
         .replace("%%", "/%%/")
         .replace("%a", song_data["artist"])
@@ -162,7 +160,6 @@ def custom_format(string, song_data):
         .replace("%p", to_h_m_s(int(song_data["position"])))
         .replace("/%%/", "%")
     )
-    return string
 
 
 def main(args):
@@ -173,7 +170,7 @@ def main(args):
     if config_path:
         config_ini = load_config(config_path, defaults)
         config = dict.fromkeys(defaults)
-        for key in defaults.keys():
+        for key in defaults:
             if args_dict[key] != "":
                 config[key] = args_dict[key]
             else:
@@ -276,7 +273,7 @@ def main(args):
                         {
                             "label": custom_format(button_one, song_data),
                             "url": custom_format(button_url_one, song_data),
-                        }
+                        },
                     ]
                 else:
                     buttons = [
@@ -337,7 +334,7 @@ def argparser():
     """Sets up argument parser for CLI"""
     parser = argparse.ArgumentParser(
         prog="cmus-rpc-py",
-        description="Discord rich presence integration for cmus music player"
+        description="Discord rich presence integration for cmus music player",
     )
     parser._positionals.title = "arguments"
 
@@ -347,7 +344,7 @@ def argparser():
         type=str,
         default=defaults["appid"],
         action="store",
-        help="custom Discord app ID"
+        help="custom Discord app ID",
     )
     parser.add_argument(
         "-i",
@@ -355,42 +352,42 @@ def argparser():
         type=int,
         default=defaults["interval"],
         action="store",
-        help="custom interval for updating the presence (min 5s)"
+        help="custom interval for updating the presence (min 5s)",
     )
     parser.add_argument(
         "-c",
         "--config",
         type=str,
         action="store",
-        help="custom path to config file, if file does not exist, config with defaults wil be created"
+        help="custom path to config file, if file does not exist, config with defaults wil be created",
     )
     parser.add_argument(
         "-s",
         "--silent",
         action="store_true",
         default=defaults["silent"],
-        help="surpass all prints"
+        help="surpass all prints",
     )
     parser.add_argument(
         "-t",
         "--timestamp",
         action="store_true",
         default=defaults["timestamp"],
-        help="show timestamp"
+        help="show timestamp",
     )
     parser.add_argument(
         "-o",
         "--song-time",
         action="store_true",
         default=defaults["song_time"],
-        help="show song position time instead timestamp"
+        help="show song position time instead timestamp",
     )
     parser.add_argument(
         "-k",
         "--no-unknown",
         action="store_true",
         default=defaults["no_unknown"],
-        help="dont use Unknown when there are no tags"
+        help="dont use Unknown when there are no tags",
     )
 
     # images
@@ -399,21 +396,21 @@ def argparser():
         type=str,
         action="store",
         default=defaults["large_image"],
-        help="custom large image"
+        help="custom large image",
     )
     parser.add_argument(
         "--playing-image",
         type=str,
         default=defaults["playing_image"],
         action="store",
-        help="custom playing image"
+        help="custom playing image",
     )
     parser.add_argument(
         "--paused-image",
         type=str,
         default=defaults["paused_image"],
         action="store",
-        help="custom paused image"
+        help="custom paused image",
     )
 
     # texts
@@ -422,14 +419,14 @@ def argparser():
         type=str,
         default=defaults["details_text"],
         action="store",
-        help="custom details text (first line)"
+        help="custom details text (first line)",
     )
     parser.add_argument(
         "--state-text",
         type=str,
         default=defaults["state_text"],
         action="store",
-        help="custom state text (second line)"
+        help="custom state text (second line)",
     )
 
     # buttons
@@ -438,41 +435,41 @@ def argparser():
         type=str,
         default=defaults["button_one"],
         action="store",
-        help="custom text in first button"
+        help="custom text in first button",
     )
     parser.add_argument(
         "--button-two",
         type=str,
         default=defaults["button_two"],
         action="store",
-        help="custom text in second button"
+        help="custom text in second button",
     )
     parser.add_argument(
         "--button-url-one",
         type=str,
         default=defaults["button_url_one"],
         action="store",
-        help="custom url first button"
+        help="custom url first button",
     )
     parser.add_argument(
         "--button-url-two",
         type=str,
         default=defaults["button_url_two"],
         action="store",
-        help="custom url second button"
+        help="custom url second button",
     )
 
     parser.add_argument(
         "-d",
         "--debug",
         action="store_true",
-        help="enable debug mode"
+        help="enable debug mode",
     )
     parser.add_argument(
         "-v",
         "--version",
         action="version",
-        version="%(prog)s 0.1.1"
+        version="%(prog)s 0.1.1",
     )
     return parser.parse_args()
 
