@@ -72,7 +72,7 @@ or file name is just song name and parent directory is artist:
 Large and small images can be changed by setting image name to use. [Available images](https://github.com/mzivic7/cmus-rpc-py/blob/main/assets/).
 
 ## Installing
-- From AUR: yay -S cmus-rpc-py
+- From AUR: `yay -S cmus-rpc-py`
 - Build, then copy built executable to system:  
 `sudo cp dist/cmus-rpc-py /usr/local/sbin/`  
 
