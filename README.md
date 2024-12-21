@@ -71,16 +71,17 @@ or file name is just song name and parent directory is artist:
 
 Large and small images can be changed by setting image name to use. [Available images](https://github.com/mzivic7/cmus-rpc-py/blob/main/assets/).
 
+## Installing
+- From AUR: yay -S cmus-rpc-py
+- Build, then copy built executable to system:  
+`sudo cp dist/cmus-rpc-py /usr/local/sbin/`  
+
 ## Building
 1. Clone this repository: `git clone https://github.com/mzivic7/cmus-rpc-py`
 2. Install [pipenv](https://docs.pipenv.org/install/)
 3. `cd cmus-rpc-py`
 4. Install requirements: `pipenv install`
 5. build: `pipenv run python -m PyInstaller --noconfirm --onefile --windowed --clean --name "cmus-rpc-py" "main.py"`
-
-## Installing
-Copy built executable to system:  
-`sudo cp dist/cmus-rpc-py /usr/local/sbin/`  
 
 ## Auto run when cmus is started
 append this line to `.bashrc` or `.zshrc`:
