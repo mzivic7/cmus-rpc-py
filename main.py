@@ -33,7 +33,7 @@ def load_config(path, default):
     Loads settings from config
     If some value is missing, it is replaced wih default value
     """
-    config = ConfigParser()
+    config = ConfigParser(interpolation=None)
     path = os.path.expanduser(path)
     config.read(path)
     if not os.path.exists(path):
