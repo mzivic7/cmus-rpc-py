@@ -40,7 +40,10 @@ def load_config(path, default):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         config.add_section("main")
         for key in default:
-            config.set("main", key, str(default[key]))
+            if default[key] in (True, False, None) or isinstance(default[key], int):
+                config.set("main", key, str(default[key]))
+            else:
+                config.set("main", key, f'"{default[key]}"')
         with open(path, "w") as f:
             config.write(f)
         config_data = default
