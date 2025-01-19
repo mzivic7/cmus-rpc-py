@@ -6,7 +6,7 @@ import sys
 import time
 from ast import literal_eval
 from configparser import ConfigParser
-
+import pypresence.exceptions
 from pypresence import Presence
 
 defaults = {
@@ -207,7 +207,7 @@ def main(args):
     rpc = Presence(config["appid"])
     try:
         rpc.connect()
-    except ConnectionRefusedError:
+    except (ConnectionRefusedError, pypresence.exceptions.DiscordNotFound):
         if not silent or debug:
             print("Can't connect to Discord, exitting...")
         sys.exit()
