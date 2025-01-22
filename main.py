@@ -6,6 +6,7 @@ import sys
 import time
 from ast import literal_eval
 from configparser import ConfigParser
+
 import pypresence.exceptions
 from pypresence import Presence
 
@@ -309,7 +310,7 @@ def main(args):
                     buttons=buttons,
                     start=play_time,
                 )
-            except BrokenPipeError:
+            except (BrokenPipeError, pypresence.exceptions.PipeClosed):
                 if not silent or debug:
                     print("Connection to Discord lost, exitting...")
                 break
