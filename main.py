@@ -8,7 +8,7 @@ from ast import literal_eval
 from configparser import ConfigParser
 
 import pypresence.exceptions
-from pypresence import Presence
+from pypresence import ActivityType, Presence
 
 defaults = {
     "appid": 1312496743879016488,
@@ -303,6 +303,7 @@ def main(args):
 
             try:
                 rpc.update(
+                    activity_type = ActivityType.LISTENING,
                     state=custom_format(state, song_data),
                     details=custom_format(details, song_data),
                     large_image=large_image,
@@ -473,7 +474,7 @@ def argparser():
         "-v",
         "--version",
         action="version",
-        version="%(prog)s 0.1.1",
+        version="%(prog)s 0.1.2",
     )
     return parser.parse_args()
 
