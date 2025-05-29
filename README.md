@@ -12,7 +12,6 @@ Discord rich presence integration for [cmus](https://cmus.github.io) music playe
 - Shuts down when either cmus or Discord is closed
 - Optional custom Discord appid
 - Config
-- [TODO] Different images to chose from
 
 ## Usage
 ```
@@ -84,8 +83,8 @@ Large and small images can be changed by setting image name to use. [Available i
 5. build: `pipenv run python -m PyInstaller --noconfirm --onefile --windowed --clean --name "cmus-rpc-py" "main.py"`
 
 ## Auto run when cmus is started
-append this line to `.bashrc` or `.zshrc`:
-alias cmus = 'cmus-rpc-py -s & cmus'
+append this line to `.bashrc` or `.zshrc`:  
+alias cmus = 'cmus-rpc-py -s & cmus'  
 
 ## Launcher
 Example launcher for cmus with cmus-rpc-py.  
@@ -97,7 +96,7 @@ Launching gnome terminal (can be added as launcher):
 ```
 gnome-terminal --window -- /bin/sh -c "cmus-rpc-py -s & cmus"
 ```
-Launching with [cmus-auto-lyrics](https://github.com/mzivic7/cmus-auto-lyrics):
+Launching with [cmus-auto-lyrics](https://github.com/mzivic7/cmus-auto-lyrics):  
 ```
 bash -c "tmux new-session -s cmus -d -x '$(tput cols)' -y '$(tput lines)' $'cmus-rpc-py -s & cmus'; tmux split -h -l40 $'cmus-auto-lyrics -a'; tmux select-pane -t 0; tmux attach -t cmus"
 ```
